@@ -6,11 +6,13 @@ import os
 
 from requests.exceptions import *
 
+from cloudelementssdk.schemas.jsonschemas import *
+from cloudelementssdk.validation import validate_schema
+
 log = logging.getLogger(__name__)
 
 
 def _log_info(path, status, data, request_type, headers, chrono,  exception=None):
-
     if exception:
         log.error(
             "[CloudElements] \
@@ -62,7 +64,7 @@ class BaseRequest(object):
 
     def _send_request(self, url, method='GET', **kwargs):
         """ Base send method for request """
-        headers = kwargs.get('headers', None)
+        headers = kwargs.get('headers', {})
         params = kwargs.get('params', None)
         data = kwargs.get('data', None)
         auth_token = kwargs.get('auth_token')
@@ -74,10 +76,10 @@ class BaseRequest(object):
         exception = None
         chrono = time.time()
         status = None
+        response = None
 
         try:
             method = method.upper()
-            response = None
             if method == 'GET':
                 response = requests.get(url, headers=headers, params=params)
             elif method == 'POST':
@@ -99,10 +101,21 @@ class BaseRequest(object):
                     headers=headers,
                     data=data
                 )
+            elif method == 'PATCH':
+                response = requests.patch(
+                    url=url,
+                    params=params,
+                    headers=headers,
+                    data=data
+                )
+            else:
+                raise Exception("Method not found.")
 
             status = response.status_code
 
-            return response
+            if response.status_code >= 400:
+                response.raise_for_status()
+
         except Exception as exc:
             exception = exc
 
@@ -117,6 +130,8 @@ class BaseRequest(object):
                 exception=exception
             )
 
+        return response
+
     def _post(self, url, data, **kwargs):
         params = kwargs.get('params')
         headers = kwargs.get('headers' , self.headers)
@@ -126,17 +141,19 @@ class BaseRequest(object):
             data=data,
             method='POST',
             headers=headers,
-            params=params
+            params=params,
+            **kwargs
         )
 
     def _get(self, url, params=None, **kwargs):
-        headers = kwargs.get('headers')
+        headers = kwargs.get('headers', {})
 
         return self._send_request(
             url=url,
             method='GET',
             params=params,
-            headers=headers
+            headers=headers,
+            **kwargs
         )
 
     def _put(self, url, data, **kwargs):
@@ -148,24 +165,130 @@ class BaseRequest(object):
             method='PUT',
             data=data,
             params=params,
-            headers=headers
+            headers=headers,
+            **kwargs
+        )
+
+    def _patch(self, url, data, **kwargs):
+        headers = kwargs.get('headers', self.headers)
+        params = kwargs.get('params')
+
+        return self._send_request(
+            url=url,
+            method='PATCH',
+            data=data,
+            params=params,
+            headers=headers,
+            **kwargs
         )
 
     def _delete(self, url, **kwargs):
-        headers = kwargs.get('headers', self.headers)
+        headers = kwargs.get('headers', {})
         params = kwargs.get('params')
 
         return self._send_request(
             url=url,
             method='DELETE',
             params=params,
-            headers=headers
+            headers=headers,
+            **kwargs
         )
 
 
 class CloudElements(BaseRequest):
         base_url = 'https://console.cloud-elements.com/elements/api-v2'
+        auth_token = ''
 
+        def __init__(self, auth_token):
+            super(BaseRequest, self).__init__
+            self.auth_token = auth_token
+            self.headers['Authorization'] = auth_token
+
+        def get_accounts(self,  query):
+            """ /accounts GET """
+            pass
+
+        def create_accounts(self, data):
+            """ /accounts POST """
+            pass
+
+        def get_account_by_id(self, acct_id):
+            """ /accounts/{id} GET """
+            pass
+
+        def update_account_by_id(self, acct_id, data):
+            """ /accounts/{id} PATCH """
+            pass
+
+        def delete_account_by_id(self, acct_id):
+            """ /accounts/{id} DELETE """
+            pass
+
+        def bulk_query():
+            """ /bulk/query GET """
+            pass
+
+        def get_bulk_job_status(self, jobid):
+            """ /bulk/{id}/status GET """
+            pass
+
+        def get_bulk_job_errors(self, jobid):
+            """ /bulk/{id}/errors GET """
+            pass
+
+        def get_bulk_job_object(self, jobid, object_name):
+            """ /bulk/{id}/{object_name} GET """
+            pass
+
+        def upload_bulk(self, object_name, data):
+            """
+                /bulk/{object_name} POST
+                Bulk upload of file objects to object_name
+            """
+            pass
+
+        def create_contact(self, data):
+            """ /contacts POST """
+            pass
+
+        def get_contact(self, contact_id):
+            """ /contacts/{id} GET """
+            pass
+
+        def get_contacts(self, query):
+            """ /contacts GET """
+            pass
+
+        def update_contact(self, contact_id, data):
+            """ /contacts/{id} PATCH """
+            pass
+
+        def delete_contact(self, contact_id):
+            """ /contacts/{id} DELETE """
+            pass
+
+        def get_leads(self, query):
+            """ /leads GET """
+            pass
+
+        def create_lead(self, data):
+            """ /leads POST """
+
+            pass
+
+        def get_lead(self, id):
+            """ /leads/{id} GET """
+            pass
+
+        def update_lead(self, lead_id, data):
+            """ /leads/{id} PATCH """
+            pass
+
+        def delete_lead(self, id):
+            """ /leads/{id} DELETE """
+            pass
+
+        #TODO opportunities, objects, users
 
 """
 Response Messages
