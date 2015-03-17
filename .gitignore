@@ -20,3 +20,5 @@ Thumbs.db
 .fuse?
 .fuse*
 .coverage*
+coverage.xml
+junit.xml

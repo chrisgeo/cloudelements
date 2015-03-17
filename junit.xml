@@ -1,1 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?><testsuite errors="0" failures="0" name="pytest" skips="0" tests="1" time="0.073"><testcase classname="tests.unit.test_validate" name="test_validate_decorator" time="0.0613830089569"/></testsuite>
