@@ -1,0 +1,5 @@
+mock
+pytest
+pytest-cov
+git+git://github.com/mverteuil/pytest-ipdb.git
+pytest-xdist
