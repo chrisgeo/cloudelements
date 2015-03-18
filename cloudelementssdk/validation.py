@@ -1,6 +1,6 @@
 import logging
-from validictory import SchemaValidator, validate
-from validictory import ValidationError, SchemaValidator, FieldValidationError
+from validictory import validate
+from validictory import ValidationError
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ def validate_schema(schema):
                 raise NoDataException("Missing Data")
 
             try:
-                validate(data, schema)
+                validate(data, schema, fail_fast=False)
             except ValidationError as validation_error:
                 log.info(
                     "[event=validate_schema][schema=%s] "
@@ -42,7 +42,18 @@ def validate_schema(schema):
                     '[event=validate_schema] Schema valiation message=%s',
                     validation_error.message
                 )
-                return False
+                if hasattr(validation_error, 'errors'):
+                    return [
+                        dict(
+                            field=error.fieldname,
+                            error=error.value,
+                            msg=error.message) for error in validation_error.errors
+                    ]
+                return [dict(
+                    field=validation_error.fieldname,
+                    value=validation_error.value,
+                    msg=validation_error.message
+                )]
 
             return func(*args, **kwargs)
         return decorator
