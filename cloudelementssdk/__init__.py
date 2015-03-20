@@ -82,7 +82,8 @@ class BaseRequest(object):
 
     def _send_request(self, url, method='GET', **kwargs):
         """ Base send method for request """
-        headers = kwargs.get('headers', {})
+        headers = self.headers.copy()
+        headers.update(kwargs.get('headers', {}))
         params = kwargs.get('params', None)
         data = kwargs.get('data', None)
         url = '%s%s' % (self.base_url, url)
@@ -206,8 +207,9 @@ class BaseRequest(object):
 
 class CloudElements(BaseRequest):
         base_url = 'https://api.cloud-elements.com/elements/api-v2'
-        auth_token = "Authorization: User {user_secret}, " \
+        auth_token_template = "User {user_secret}, " \
                                     "Organization {org_secret}"
+        element_template = ', Element: {element_token}'
 
         post_headers = {
             "Content-type": "application/json",
@@ -216,21 +218,34 @@ class CloudElements(BaseRequest):
         }
 
         paths = {
-            'accounts': '/accounts',
-            'instances': '/instances',
-            'leads': '/leads',
-            'contacts': '/contacts',
+            'accounts': '/hubs/crm/accounts',
+            'leads': '/hubs/crm/leads',
+            'contacts': '/hubs/crm/contacts',
+            'bulk': '/hubs/crm/bulk',
             'element': '/elements',
-            'bulk': '/bulk'
+            'instances': '/instances',
+            'elements': '/elements'
         }
 
-        def __init__(self, user_secret, org_secret):
-            super(BaseRequest, self).__init__
-            self.key = user_secret
-            self.secret = org_secret
-            self.auth_token = self.auth_token. \
-                format(user_secret=user_secret, org_secret=org_secret)
-            self.headers['Authorization'] = self.auth_token
+        def __init__(self, user_secret, org_secret, element_token=None):
+            super(CloudElements, self).__init__()
+            self.user_secret = user_secret
+            self.org_secret = org_secret
+            self.element_token = element_token
+
+        def _send_request(self, url, method='GET', **kwargs):
+            auth_header = self.auth_token_template. \
+                format(user_secret=self.user_secret, org_secret=self.org_secret)
+
+            if self.element_token:
+                log.debug('[event=send_request] Adding element token.')
+                auth_header = \
+                    auth_header + self.element_template.format(element_token=self.element_token)
+                log.debug('Auth header is: %s', auth_header)
+
+            kwargs['headers']['Authorization'] = auth_header
+            # Oh so hacky.
+            return super(CloudElements, self)._send_request(url, method, **kwargs)
 
         def _patch(self, url, data, **kwargs):
             headers = self.headers.copy()
@@ -262,20 +277,20 @@ class CloudElements(BaseRequest):
                 **kwargs
             )
 
-        def get_accounts(self,  query):
-            """ /accounts GET """
+        def get_crm_accounts(self,  query):
+            """ /hubs/crm/accounts GET """
             params = {
-                'query': query
+                'where': query
             }
             return self._get(self.paths['accounts'], params=params)
 
         @validate_schema(schema=account_schema)
-        def create_accounts(self, data):
-            """ /accounts POST """
+        def create_crm_accounts(self, data):
+            """ /hubs/crm/accounts POST """
             return self._post(self.paths['accounts'], data=data)
 
-        def get_account_by_id(self, acct_id):
-            """ /accounts/{id} GET """
+        def get_crm_account_by_id(self, acct_id):
+            """ /hubs/crm/accounts/{id} GET """
             url = "%s/%s" % (
                 self.paths['accounts'],
                 acct_id
@@ -284,8 +299,8 @@ class CloudElements(BaseRequest):
             return self._get(url)
 
         @validate_schema(schema=account_schema)
-        def update_account_by_id(self, acct_id, data):
-            """ /accounts/{id} PATCH """
+        def update_crm_account_by_id(self, acct_id, data):
+            """ /hubs/crm/accounts/{id} PATCH """
             url = "%s/%s" % (
                 self.paths['accounts'],
                 acct_id
@@ -293,8 +308,8 @@ class CloudElements(BaseRequest):
 
             return self._patch(url, data=data)
 
-        def delete_account_by_id(self, acct_id):
-            """ /accounts/{id} DELETE """
+        def delete_crm_account_by_id(self, acct_id):
+            """ /hubs/crm/accounts/{id} DELETE """
             url = "%s/%s" % (
                 self.paths['accounts'],
                 acct_id
@@ -302,42 +317,42 @@ class CloudElements(BaseRequest):
 
             return self._delete(url)
 
-        def bulk_query():
-            """ /bulk/query GET """
+        def bulk_crm_query():
+            """ /hubs/crm/bulk/query GET """
             pass
 
-        def get_bulk_job_status(self, jobid):
-            """ /bulk/{id}/status GET """
+        def get_crm_bulk_job_status(self, jobid):
+            """ /hubs/crm/bulk/{id}/status GET """
             pass
 
-        def get_bulk_job_errors(self, jobid):
-            """ /bulk/{id}/errors GET """
+        def get_crm_bulk_job_errors(self, jobid):
+            """ /hubs/crm/bulk/{id}/errors GET """
             pass
 
-        def get_bulk_job_object(self, jobid, object_name):
-            """ /bulk/{id}/{object_name} GET """
+        def get_crm_bulk_job_object(self, jobid, object_name):
+            """ /hubs/crm/bulk/{id}/{object_name} GET """
             pass
 
-        def upload_bulk(self, object_name, data):
+        def upload_crm_bulk(self, object_name, data):
             """
-                /bulk/{object_name} POST
+                /hubs/crm/bulk/{object_name} POST
                 Bulk upload of file objects to object_name
             """
             pass
 
         @validate_schema(schema=contact_schema)
-        def create_contact(self, data):
-            """ /contacts POST """
+        def create_crm_contact(self, data):
+            """ /hubs/crm/contacts POST """
             url = self.paths['contacts']
             return self._post(url, data=data)
 
-        def get_contact(self, contact_id):
-            """ /contacts/{id} GET """
+        def get_crm_contact(self, contact_id):
+            """ /hubs/crm/contacts/{id} GET """
             url = '%s/%s' % (self.paths['contacts'], contact_id)
             return self._get(url)
 
-        def get_contacts(self, query):
-            """ /contacts GET """
+        def get_crm_contacts(self, query):
+            """ /hubs/crm/contacts GET """
             params = {
                 'query': query
             }
@@ -345,20 +360,20 @@ class CloudElements(BaseRequest):
             return self._get(self.paths['contacts'], params=params)
 
         @validate_schema(schema=contact_schema)
-        def update_contact(self, contact_id, data):
-            """ /contacts/{id} PATCH """
+        def update_crm_contact(self, contact_id, data):
+            """ /hubs/crm/contacts/{id} PATCH """
             url = '%s/%s'  % (self.paths['contacts'], contact_id)
 
             return self._patch(url, data=data)
 
-        def delete_contact(self, contact_id):
-            """ /contacts/{id} DELETE """
+        def delete_crm_contact(self, contact_id):
+            """ /hubs/crm/contacts/{id} DELETE """
             url = '%s/%s'  % (self.paths['contacts'], contact_id)
 
             return self._delete(url)
 
-        def get_leads(self, query):
-            """ /leads GET """
+        def get_crm_leads(self, query):
+            """ /hubs/crm/leads GET """
             params = {
                 'query': query
             }
@@ -366,26 +381,26 @@ class CloudElements(BaseRequest):
             return self._get(self.paths['leads'], params=params)
 
         @validate_schema(schema=lead_schema)
-        def create_lead(self, data):
-            """ /leads POST """
+        def create_crm_lead(self, data):
+            """ /hubs/crm/leads POST """
 
             return self._post(self.paths['leads'], data=data)
 
-        def get_lead(self, lead_id):
-            """ /leads/{id} GET """
+        def get_crm_lead(self, lead_id):
+            """ /hubs/crm/leads/{id} GET """
             url = '%s/%s' % (self.paths['leads'], lead_id)
 
             return self._get(url)
 
         @validate_schema(schema=lead_schema)
-        def update_lead(self, lead_id, data):
-            """ /leads/{id} PATCH """
+        def update_crm_lead(self, lead_id, data):
+            """ /hubs/crm/leads/{id} PATCH """
             url = '%s/%s' % (self.paths['leads'], lead_id)
 
             return self._patch(url, data=data)
 
-        def delete_lead(self, lead_id):
-            """ /leads/{id} DELETE """
+        def delete_crm_lead(self, lead_id):
+            """ /hubs/crm/leads/{id} DELETE """
             url = '%s/%s' % (self.paths['leads'], lead_id)
 
             return self._delete(url)
@@ -467,5 +482,10 @@ class CloudElements(BaseRequest):
             """ /instances/{id} DELETE """
             url = '/instances/%s' % id
             return self._delete(url)
+
+        def get_instances(self):
+            """ /instances GET """
+
+            return self._get(self.paths['instances'])
 
         #TODO opportunities, objects, users

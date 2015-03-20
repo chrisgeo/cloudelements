@@ -47,6 +47,65 @@ class TestCloudElements(unittest.TestCase):
                 'element':  'sfdc'
             }
 
+    def test_get_instances(self):
+        resp = self.cloud_elements.get_instances()
+        assert resp.status_code == 200
+        assert resp.json() is not None
+        assert type(resp.json()) == list
+
+    def test_get_crm_accounts(self):
+        resp = self.cloud_elements.get_instances()
+        assert resp.status_code == 200
+        instances = resp.json()
+        instance = instances.pop()
+        self.cloud_elements.element_token = instance['token']
+        resp = self.cloud_elements.get_crm_accounts(query="name like 'Chris'")
+        assert resp is not None
+        assert type(resp.json()) == list
+
+    def test_create_crm_account(self):
+        return
+        #TODO SalesForce Instance needs storage
+        resp = self.cloud_elements.get_instances()
+        assert resp.status_code == 200
+        instances = resp.json()
+        assert len(instances) > 0
+        instance = instances[0]
+        self.cloud_elements.element_token = instance['token']
+
+        resp = self.cloud_elements.create_crm_accounts(data={
+            'Name': 'Chris George'
+        })
+        assert resp.status_code == 200
+        account = resp.json()
+        resp = self.cloud_elements.delete_crm_account_by_id(acct_id=account['id'])
+        assert resp.status_code == 200
+
+    def test_get_crm_contacts(self):
+        resp = self.cloud_elements.get_instances()
+        assert resp.status_code == 200
+        instances = resp.json()
+        assert len(instances) > 0
+        instance = instances[0]
+        self.cloud_elements.element_token = instance['token']
+
+        resp = self.cloud_elements.get_crm_contacts(query='name like "chris"')
+        resp.status_code == 200
+        assert resp.json() is not None
+        assert type(resp.json()) == list
+
+    def test_get_crm_leads(self):
+        resp = self.cloud_elements.get_instances()
+        assert resp.status_code == 200
+        instances = resp.json()
+        assert len(instances) > 0
+        instance = instances[0]
+        self.cloud_elements.element_token = instance['token']
+        resp = self.cloud_elements.get_crm_leads(query='name like "chris"')
+        resp.status_code == 200
+        assert resp.json() is not None
+        assert type(resp.json()) == list
+
     """ We're just going to revisit this later
     def test_provision_sales_force_instance(self):
         import random
