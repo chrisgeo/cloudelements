@@ -19,16 +19,21 @@ def validate_schema(schema):
             # be in the second or third position
             # in the tuple since the methods follow
             # the format of self, id, data
-            data = None
-            l = len(args)
-
-            if l == 2:
-                data = args[1]
-            elif l == 3:
-                data = args[2]
-
+            data = kwargs.get('data', None)
             if not data:
-                raise NoDataException("Missing Data")
+                l = len(args)
+                if l == 1:
+                    data = args[0]
+                elif l == 2:
+                    data = args[1]
+                elif l == 3:
+                    data = args[2]
+
+            log.debug(
+                "[event=validate_schema][schema=%s] Data is: %s",
+                schema,
+                data
+            )
 
             try:
                 validate(data, schema, fail_fast=False)
@@ -42,12 +47,14 @@ def validate_schema(schema):
                     '[event=validate_schema] Schema valiation message=%s',
                     validation_error.message
                 )
+
                 if hasattr(validation_error, 'errors'):
                     return [
                         dict(
                             field=error.fieldname,
                             error=error.value,
-                            msg=error.message) for error in validation_error.errors
+                            msg=error.message
+                        ) for error in validation_error.errors
                     ]
                 return [dict(
                     field=validation_error.fieldname,

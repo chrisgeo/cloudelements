@@ -1,3 +1,19 @@
+"""
+Response Messages
+HTTP Status Code    Reason  Response Model
+200 OK - Everything worked as expected
+400 Bad Request - Often due to a missing request parameter
+401 Unauthorized - An invalid element token, user secret and/or org secret provided
+403 Forbidden - Access to the resource by the provider is forbidden
+404 Not found - The requested resource is not found
+405 Method not allowed - Incorrect HTTP verb used, e.g., GET used when POST expected
+406 Not acceptable - The response content type does not match the "Accept" header value
+409 Conflict - If a resource being created already exists
+415 Unsupported media type - The server cannot handle the requested Content-Type
+500 Server error - Something went wrong on the Cloud Elements server
+502 Provider server error - Something went wrong on the Provider or Endpoint's server
+"""
+
 import logging
 import json
 import requests
@@ -8,6 +24,12 @@ from requests.exceptions import *
 
 from cloudelementssdk.schemas.jsonschemas import *
 from cloudelementssdk.validation import validate_schema
+
+if os.getenv('DEBUG', False):
+    from logging.config import dictConfig
+    dictConfig(
+        json.loads(open('dev_logging.conf').read())
+    )
 
 log = logging.getLogger(__name__)
 
@@ -52,11 +74,7 @@ class BaseRequest(object):
     """ BaseRequest Object for Resources
     """
     base_url = ''
-    headers = {
-        "Content-type": "application/json",
-        "Accept":  "application/json",
-        "Connection": "close",
-    }
+    headers  = {}
 
     def __init__(self, base_url=None):
         """ Initialization function for BaseRequest """
@@ -67,11 +85,7 @@ class BaseRequest(object):
         headers = kwargs.get('headers', {})
         params = kwargs.get('params', None)
         data = kwargs.get('data', None)
-        auth_token = kwargs.get('auth_token')
         url = '%s%s' % (self.base_url, url)
-
-        if auth_token:
-            headers['Authorization'] = auth_token
 
         exception = None
         chrono = time.time()
@@ -110,11 +124,6 @@ class BaseRequest(object):
                 )
             else:
                 raise Exception("Method not found.")
-
-            status = response.status_code
-
-            if response.status_code >= 400:
-                response.raise_for_status()
 
         except Exception as exc:
             exception = exc
@@ -196,33 +205,102 @@ class BaseRequest(object):
 
 
 class CloudElements(BaseRequest):
-        base_url = 'https://console.cloud-elements.com/elements/api-v2'
-        auth_token = ''
+        base_url = 'https://api.cloud-elements.com/elements/api-v2'
+        auth_token = "Authorization: User {user_secret}, " \
+                                    "Organization {org_secret}"
 
-        def __init__(self, auth_token):
+        post_headers = {
+            "Content-type": "application/json",
+            "Accept":  "application/json",
+            "Connection": "close",
+        }
+
+        paths = {
+            'accounts': '/accounts',
+            'instances': '/instances',
+            'leads': '/leads',
+            'contacts': '/contacts',
+            'element': '/elements',
+            'bulk': '/bulk'
+        }
+
+        def __init__(self, user_secret, org_secret):
             super(BaseRequest, self).__init__
-            self.auth_token = auth_token
-            self.headers['Authorization'] = auth_token
+            self.key = user_secret
+            self.secret = org_secret
+            self.auth_token = self.auth_token. \
+                format(user_secret=user_secret, org_secret=org_secret)
+            self.headers['Authorization'] = self.auth_token
+
+        def _patch(self, url, data, **kwargs):
+            headers = self.headers.copy()
+            headers.update(self.post_headers)
+            headers.update(kwargs.get('headers', {}))
+            params = kwargs.get('params')
+
+            return self._send_request(
+                url=url,
+                data=json.dumps(data),
+                method='PATCH',
+                headers=headers,
+                params=params,
+                **kwargs
+            )
+
+        def _post(self, url, data, **kwargs):
+            headers = self.headers.copy()
+            headers.update(self.post_headers)
+            headers.update(kwargs.get('headers', {}))
+            params = kwargs.get('params')
+
+            return self._send_request(
+                url=url,
+                data=json.dumps(data),
+                method='POST',
+                headers=headers,
+                params=params,
+                **kwargs
+            )
 
         def get_accounts(self,  query):
             """ /accounts GET """
-            pass
+            params = {
+                'query': query
+            }
+            return self._get(self.paths['accounts'], params=params)
 
+        @validate_schema(schema=account_schema)
         def create_accounts(self, data):
             """ /accounts POST """
-            pass
+            return self._post(self.paths['accounts'], data=data)
 
         def get_account_by_id(self, acct_id):
             """ /accounts/{id} GET """
-            pass
+            url = "%s/%s" % (
+                self.paths['accounts'],
+                acct_id
+            )
 
+            return self._get(url)
+
+        @validate_schema(schema=account_schema)
         def update_account_by_id(self, acct_id, data):
             """ /accounts/{id} PATCH """
-            pass
+            url = "%s/%s" % (
+                self.paths['accounts'],
+                acct_id
+            )
+
+            return self._patch(url, data=data)
 
         def delete_account_by_id(self, acct_id):
             """ /accounts/{id} DELETE """
-            pass
+            url = "%s/%s" % (
+                self.paths['accounts'],
+                acct_id
+            )
+
+            return self._delete(url)
 
         def bulk_query():
             """ /bulk/query GET """
@@ -247,61 +325,147 @@ class CloudElements(BaseRequest):
             """
             pass
 
+        @validate_schema(schema=contact_schema)
         def create_contact(self, data):
             """ /contacts POST """
-            pass
+            url = self.paths['contacts']
+            return self._post(url, data=data)
 
         def get_contact(self, contact_id):
             """ /contacts/{id} GET """
-            pass
+            url = '%s/%s' % (self.paths['contacts'], contact_id)
+            return self._get(url)
 
         def get_contacts(self, query):
             """ /contacts GET """
-            pass
+            params = {
+                'query': query
+            }
 
+            return self._get(self.paths['contacts'], params=params)
+
+        @validate_schema(schema=contact_schema)
         def update_contact(self, contact_id, data):
             """ /contacts/{id} PATCH """
-            pass
+            url = '%s/%s'  % (self.paths['contacts'], contact_id)
+
+            return self._patch(url, data=data)
 
         def delete_contact(self, contact_id):
             """ /contacts/{id} DELETE """
-            pass
+            url = '%s/%s'  % (self.paths['contacts'], contact_id)
+
+            return self._delete(url)
 
         def get_leads(self, query):
             """ /leads GET """
-            pass
+            params = {
+                'query': query
+            }
 
+            return self._get(self.paths['leads'], params=params)
+
+        @validate_schema(schema=lead_schema)
         def create_lead(self, data):
             """ /leads POST """
 
-            pass
+            return self._post(self.paths['leads'], data=data)
 
-        def get_lead(self, id):
+        def get_lead(self, lead_id):
             """ /leads/{id} GET """
-            pass
+            url = '%s/%s' % (self.paths['leads'], lead_id)
 
+            return self._get(url)
+
+        @validate_schema(schema=lead_schema)
         def update_lead(self, lead_id, data):
             """ /leads/{id} PATCH """
-            pass
+            url = '%s/%s' % (self.paths['leads'], lead_id)
 
-        def delete_lead(self, id):
+            return self._patch(url, data=data)
+
+        def delete_lead(self, lead_id):
             """ /leads/{id} DELETE """
-            pass
+            url = '%s/%s' % (self.paths['leads'], lead_id)
+
+            return self._delete(url)
+
+        def get_sales_force_provision_url(self, key, secret, callback_url):
+            """ /elements/{key}/oauth/url GET
+                returns:
+                {
+                    "oauthUrl": url,
+                    "element": element name,
+                }
+            """
+            url =  '/elements/sfdc/oauth/url'
+            params = {
+                'apiKey': key,
+                'apiSecret': secret,
+                'callbackUrl': callback_url
+            }
+
+            return self._get(url, params=params)
+
+        def provision_sales_force_instance(self, key, secret, callback_url, name, code, **kwargs):
+            """ Convenience specific to creating sales force instances """
+            tags = kwargs.get('tags')
+
+            """
+                returns:
+                {
+                    "id": 11,
+                    "name": "api-v2 provisioning",
+                    "token": "3sU/S/kZD36BaABPS7EAuSGHF+1wsthT+mvoukiE",
+                    "element": {
+                        "id": 39,
+                        "name": "Salesforce.com",
+                        "key": "sfdc",
+                        "description": "The Salesforce.com allows you to deliver revolutionary CRM automation functionality, such as account and contact creation, from anywhere, anytime, on any device.",
+                        "active": true,
+                        "deleted": false,
+                        "typeOauth": true,
+                        "trialAccount": false,
+                        "configDescription": "If you do not have a Salesforce.com account, you can create one at <a href="http://www.salesforce.com" target="_blank">Salesforce.com Signup</a>",
+                        "signupURL": "http://www.salesforce.com"
+                    },
+                    "provisionInteractions": [],
+                    "valid": true,
+                    "disabled": false,
+                    "maxCacheSize": 0,
+                    "cacheTimeToLive": 0,
+                    "cachingEnabled": false
+                }
+            """
+            data = {
+                'element': {
+                    'key': 'sfdc'
+                },
+                'configuration': {
+                    "oauth.callback.url": callback_url,
+                    "oauth.api.key": key,
+                    "oauth.api.secret": secret
+                },
+                'name': name,
+                'provisionCode': {
+                    'code': code
+                }
+            }
+
+            if tags is not None:
+                data['tags'] = tags
+
+            return self._provision_instance(data)
+
+        @validate_schema(schema=instance_provision_schema)
+        def _provision_instance(self, data):
+            """ /instances POST """
+
+            return self._post('/instances', data=data)
+
+        def delete_instance(self, instance_id):
+            """ /instances/{id} DELETE """
+            url = '/instances/%s' % id
+            return self._delete(url)
 
         #TODO opportunities, objects, users
-
-"""
-Response Messages
-HTTP Status Code    Reason  Response Model
-200 OK - Everything worked as expected
-400 Bad Request - Often due to a missing request parameter
-401 Unauthorized - An invalid element token, user secret and/or org secret provided
-403 Forbidden - Access to the resource by the provider is forbidden
-404 Not found - The requested resource is not found
-405 Method not allowed - Incorrect HTTP verb used, e.g., GET used when POST expected
-406 Not acceptable - The response content type does not match the "Accept" header value
-409 Conflict - If a resource being created already exists
-415 Unsupported media type - The server cannot handle the requested Content-Type
-500 Server error - Something went wrong on the Cloud Elements server
-502 Provider server error - Something went wrong on the Provider or Endpoint's server
-"""

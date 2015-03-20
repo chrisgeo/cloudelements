@@ -19,18 +19,26 @@ def test_validate_decorator():
         }
     }
 
+    class TempClass(object):
+
+        @validate_schema(schema=schema)
+        def temp_func_single(self, data):
+            return True
+
+        @validate_schema(schema=schema)
+        def temp_func_double(self, id, data):
+            return True
+
     @validate_schema(schema=schema)
-    def temp_func(self, data):
+    def temp_func_alone(data):
         return True
 
-    resp = temp_func(object(), dict(first='foo', last=1))
+    tmp_cls = TempClass()
+    resp = tmp_cls.temp_func_single(dict(first='foo', last=1))
     assert resp is True
-
-    @validate_schema(schema=schema)
-    def temp_func(self, id, data):
-        return True
-
-    resp = temp_func(object(), 1, dict(first='foo', last=1))
+    resp = tmp_cls.temp_func_double(1, dict(first='foo', last=1))
+    assert resp is True
+    resp = temp_func_alone(dict(first='foo', last=1))
     assert resp is True
 
 
@@ -53,12 +61,8 @@ def test_validate_decorator_fails():
     }
 
     @validate_schema(schema=schema)
-    def temp_func(self, data):
+    def temp_func(data):
         return True
 
-    resp = temp_func(object(), dict(first='foo', last='foo'))
+    resp = temp_func(dict(first='foo', last='foo'))
     assert resp == [{'error': 'foo', 'field': 'last', 'msg': "Value 'foo' for field '<obj>.last' is not of type integer"}]
-
-    with pytest.raises(NoDataException) as exc:
-        temp_func(1)
-    assert exc.value.message == 'Missing Data'
