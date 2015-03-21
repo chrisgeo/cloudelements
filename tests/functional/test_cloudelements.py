@@ -73,22 +73,22 @@ class TestCloudElements(unittest.TestCase):
         self.cloud_elements.element_token = instance['token']
 
         resp = self.cloud_elements.create_crm_accounts(data={
-            'Name': 'Chris George'
+            'name': 'Chris George'
         })
         assert resp.status_code == 200
         account = resp.json()
         acct_id = account['Id']
         assert acct_id is not None
-        assert account['Name'] == 'Chris George'
+        assert account['name'] == 'Chris George'
 
         resp = self.cloud_elements.update_crm_account_by_id(
             acct_id=acct_id,
-            data={'Name': 'Test'}
+            data={'name': 'Test'}
         )
 
         assert resp is not None
         assert resp.status_code == 200
-        assert resp.json()['Name'] == 'Test'
+        assert resp.json()['name'] == 'Test'
 
         resp = self.cloud_elements. \
             delete_crm_account_by_id(acct_id=account['Id'])
@@ -112,17 +112,63 @@ class TestCloudElements(unittest.TestCase):
         assert resp.json() is not None
         assert type(resp.json()) == list
 
+        resp = self.cloud_elements.create_crm_contact({'lastname': 'foo'})
+        assert resp.status_code == 200
+        contact = resp.json()
+
+        acct_id = contact['Id']
+        assert acct_id is not None
+        assert contact['lastname'] == 'foo'
+
+        resp = self.cloud_elements.update_crm_contact(
+            contact_id=acct_id,
+            data={'lastname': 'Test'}
+        )
+
+        assert resp is not None
+        assert resp.status_code == 200
+        assert resp.json()['lastname'] == 'Test'
+
+        resp = self.cloud_elements. \
+            delete_crm_contact(contact_id=acct_id)
+
+        assert resp.status_code == 200
+
     def test_crm_leads(self):
         resp = self.cloud_elements.get_instances()
         assert resp.status_code == 200
         instances = resp.json()
         assert len(instances) > 0
         instance = instances[0]
+
         self.cloud_elements.element_token = instance['token']
-        resp = self.cloud_elements.get_crm_leads(query='firstName is not null')
+        resp = self.cloud_elements.get_crm_leads(query='firstname is not null')
         resp.status_code == 200
         assert resp.json() is not None
         assert type(resp.json()) == list
+
+        resp = self.cloud_elements.\
+            create_crm_lead(data={
+                'lastname': 'foo',
+                'status': 'somestatus',
+                'company': 'Foo'
+            })
+        assert resp.status_code == 200
+        assert resp.json() is not None
+        assert resp.json()['lastname'] == 'foo'
+
+        lead = resp.json()
+        lead_id = lead['Id']
+        resp = self.cloud_elements.\
+            update_crm_lead(lead_id=lead_id, data={'lastname': 'Test'})
+
+        assert resp is not None
+        assert resp.json()['lastname'] == 'Test'
+
+        resp = self.cloud_elements.delete_crm_lead(lead_id=lead_id)
+
+        assert resp.status_code == 200
+
 
     """ We're just going to revisit this later
     def test_provision_sales_force_instance(self):

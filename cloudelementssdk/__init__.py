@@ -37,13 +37,13 @@ log = logging.getLogger(__name__)
 def _log_info(path, status, data, request_type, headers, chrono,  exception=None):
     if exception:
         log.error(
-            "[CloudElements] \
-             path=%(url)s \
-             http_status=%(http_status)s \
-             error=%(error)s \
-             request_type=%(request_type)s \
-             post=%(post)s \
-             ms=%(ms).0f", {
+            "[CloudElements] "
+            "path=%(url)s "
+            " http_status=%(http_status)s "
+            "error=%(error)s "
+            "request_type=%(request_type)s "
+            "post=%(post)s "
+            "ms=%(ms).0f", {
                 "url": path,
                 "http_status": status,
                 "error": exception,
@@ -392,7 +392,7 @@ class CloudElements(BaseRequest):
 
             return self._get(url)
 
-        @validate_schema(schema=lead_schema)
+        @validate_schema(schema=lead_schema_update)
         def update_crm_lead(self, lead_id, data):
             """ /hubs/crm/leads/{id} PATCH """
             url = '%s/%s' % (self.paths['leads'], lead_id)

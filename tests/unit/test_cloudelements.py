@@ -38,7 +38,7 @@ class TestCloudElements(unittest.TestCase):
             body=json.dumps({'foo': 1})
         )
 
-        resp = self.cloud_elements.create_crm_accounts({'Name': 'Gangta G Funk'})
+        resp = self.cloud_elements.create_crm_accounts({'name': 'Gangta G Funk'})
         assert resp.json() == {'foo': 1}
 
     @httpretty.activate
@@ -63,7 +63,7 @@ class TestCloudElements(unittest.TestCase):
             body=json.dumps({'foo': 1})
         )
         resp = self.cloud_elements. \
-            update_crm_account_by_id(acct_id=1, data={'Name': 'Mario'})
+            update_crm_account_by_id(acct_id=1, data={'name': 'Mario'})
         assert resp.json() == {'foo': 1}
 
     @httpretty.activate
@@ -115,7 +115,7 @@ class TestCloudElements(unittest.TestCase):
             ce.base_url + ce.paths['contacts'],
             body=json.dumps({'foo': 1})
         )
-        resp = self.cloud_elements.create_crm_contact({'LastName': 'foo'})
+        resp = self.cloud_elements.create_crm_contact({'lastname': 'foo'})
         assert resp.json() == {'foo': 1}
         assert httpretty.last_request().method == httpretty.POST
 
@@ -155,7 +155,8 @@ class TestCloudElements(unittest.TestCase):
             ce.base_url + ce.paths['leads'],
             body=json.dumps({'foo': 1})
         )
-        resp = self.cloud_elements.create_crm_lead({'LastName': 'foo'})
+        resp = self.cloud_elements\
+            .create_crm_lead({'lastname': 'foo' , 'company': 'foo', 'status': 'somestatus'})
         assert resp.json() == {'foo': 1}
         assert httpretty.last_request().method == httpretty.POST
 
@@ -181,7 +182,8 @@ class TestCloudElements(unittest.TestCase):
             ce.base_url + '%s/%s' % (ce.paths['leads'], 1),
             body=json.dumps({'foo': 1})
         )
-        resp = self.cloud_elements.update_crm_lead(1, {'LastName': 'foo'})
+        resp = self.cloud_elements.\
+            update_crm_lead(1, {'lastname': 'foo', 'company': 'foo', 'status': 'somestatus'})
         assert resp.json() == {'foo': 1}
         assert httpretty.last_request().method == httpretty.PATCH
 
