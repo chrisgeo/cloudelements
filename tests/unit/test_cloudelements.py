@@ -9,7 +9,7 @@ import httpretty
 
 class TestCloudElements(unittest.TestCase):
     def setUp(self):
-        from cloudelementssdk import CloudElements
+        from cloudelements import CloudElements
         self.cloud_elements = CloudElements(
             user_secret='',
             org_secret=''

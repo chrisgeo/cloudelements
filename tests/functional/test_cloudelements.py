@@ -8,7 +8,7 @@ from contextlib import nested
 class TestCloudElements(unittest.TestCase):
     def setUp(self):
         import os
-        from cloudelementssdk import CloudElements
+        from cloudelements import CloudElements
 
         self.user_secret = os.getenv('CLOUD_ELEMENTS_USER_SECRET')
         self.org_secret = os.getenv('CLOUD_ELEMENTS_ORG_SECRET')

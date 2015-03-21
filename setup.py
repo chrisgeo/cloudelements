@@ -1,5 +1,5 @@
 '''
-cloudelementssdk: SDK for Cloud Elements
+cloudelements: SDK for Cloud Elements
 
 Note that "python setup.py test" invokes pytest on the package. With appropriately
 configured setup.cfg, this will check both xxx_test modules and docstrings.
@@ -12,13 +12,13 @@ from setuptools import setup, find_packages
 import os
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.md')).read()
+README = open(os.path.join(here, 'README.markdown')).read()
 CHANGES = open(os.path.join(here, 'CHANGELOG.txt')).read()
 requires = open(os.path.join(here, 'requirements.txt')).read().splitlines()
 
 version = "0.1"
 
-setup(name="cloudelementssdk",
+setup(name="cloudelements",
       version=version,
       description="SDK for Cloud Elements",
       long_description=README + '\n\n\n' + CHANGES,
@@ -28,7 +28,7 @@ setup(name="cloudelementssdk",
       keywords="", # Separate with spaces
       author="LeadGenius",
       author_email="developer@leadgenius.com",
-      url="http://leadgenius.github.com/cloudelementssdk",
+      url="http://leadgenius.github.com/cloudelements",
       license="MIT",
       packages=find_packages(exclude=['examples', 'tests']),
       include_package_data=True,

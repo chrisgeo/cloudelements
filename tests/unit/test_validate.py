@@ -3,7 +3,7 @@ from mock import patch
 
 
 def test_validate_decorator():
-    from cloudelementssdk.validation import validate_schema
+    from cloudelements.validation import validate_schema
 
     schema = {
         'type': 'object',
@@ -43,8 +43,8 @@ def test_validate_decorator():
 
 
 def test_validate_decorator_fails():
-    from cloudelementssdk.validation import validate_schema
-    from cloudelementssdk.validation import NoDataException, ValidationError
+    from cloudelements.validation import validate_schema
+    from cloudelements.validation import NoDataException, ValidationError
 
     schema = {
         'type': 'object',

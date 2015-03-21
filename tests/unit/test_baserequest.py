@@ -13,10 +13,10 @@ class MockResponse(object):
         return dict(status_code=200, result=dict(foo='bar'))
 
 
-@patch('cloudelementssdk.requests.get')
+@patch('cloudelements.requests.get')
 def test_base_class_can_use_methods(mock_get):
-    from cloudelementssdk import BaseRequest
-    with patch('cloudelementssdk.requests.Response') as mock_response:
+    from cloudelements import BaseRequest
+    with patch('cloudelements.requests.Response') as mock_response:
         mock_response = MockResponse()
         mock_get.return_value = mock_response
         req = BaseRequest(base_url='http://www.foo.com/')
@@ -25,10 +25,10 @@ def test_base_class_can_use_methods(mock_get):
         assert response.json() == dict(status_code=200, result=dict(foo='bar'))
 
 
-@patch('cloudelementssdk.requests.post')
+@patch('cloudelements.requests.post')
 def test_base_class_can_use_post(mock_get):
-    from cloudelementssdk import BaseRequest
-    with patch('cloudelementssdk.requests.Response') as mock_response:
+    from cloudelements import BaseRequest
+    with patch('cloudelements.requests.Response') as mock_response:
         mock_response = MockResponse()
         mock_get.return_value = mock_response
         req = BaseRequest()
@@ -38,10 +38,10 @@ def test_base_class_can_use_post(mock_get):
         assert response.json() == dict(status_code=200, result=dict(foo='bar'))
 
 
-@patch('cloudelementssdk.requests.delete')
+@patch('cloudelements.requests.delete')
 def test_base_class_can_use_delete(mock_get):
-    from cloudelementssdk import BaseRequest
-    with patch('cloudelementssdk.requests.Response') as mock_response:
+    from cloudelements import BaseRequest
+    with patch('cloudelements.requests.Response') as mock_response:
         mock_response = MockResponse()
         mock_get.return_value = mock_response
         req = BaseRequest()
@@ -51,10 +51,10 @@ def test_base_class_can_use_delete(mock_get):
         assert response.json() == dict(status_code=200, result=dict(foo='bar'))
 
 
-@patch('cloudelementssdk.requests.put')
+@patch('cloudelements.requests.put')
 def test_base_class_can_use_put(mock_get):
-    from cloudelementssdk import BaseRequest
-    with patch('cloudelementssdk.requests.Response') as mock_response:
+    from cloudelements import BaseRequest
+    with patch('cloudelements.requests.Response') as mock_response:
         mock_response = MockResponse()
         mock_get.return_value = mock_response
         req = BaseRequest('http://www.foo.com/')
@@ -65,7 +65,7 @@ def test_base_class_can_use_put(mock_get):
 
 @httpretty.activate
 def test_base_request_get():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.GET,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',
@@ -80,7 +80,7 @@ def test_base_request_get():
 
 @httpretty.activate
 def test_base_request_get_with_params():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.GET,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',
@@ -95,7 +95,7 @@ def test_base_request_get_with_params():
 
 @httpretty.activate
 def test_base_request_get_fourohfour():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.GET,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',
@@ -112,7 +112,7 @@ def test_base_request_get_fourohfour():
 
 @httpretty.activate
 def test_base_request_get_with_auth_token():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.GET,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',
@@ -129,7 +129,7 @@ def test_base_request_get_with_auth_token():
 
 @httpretty.activate
 def test_base_request_post():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.POST,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',
@@ -144,7 +144,7 @@ def test_base_request_post():
 
 @httpretty.activate
 def test_base_request_put():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.PUT,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',
@@ -159,7 +159,7 @@ def test_base_request_put():
 
 @httpretty.activate
 def test_base_request_patch():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.PATCH,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',
@@ -174,7 +174,7 @@ def test_base_request_patch():
 
 @httpretty.activate
 def test_base_request_send_request_not_method():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.GET,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',
@@ -193,7 +193,7 @@ def test_base_request_send_request_not_method():
 
 @httpretty.activate
 def test_base_request_delete():
-    from cloudelementssdk import BaseRequest
+    from cloudelements import BaseRequest
     httpretty.register_uri(
         httpretty.DELETE,
         'http://api.leadgenius.com/v1/emailguess/job/status/1',

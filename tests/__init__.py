@@ -1,5 +1,5 @@
 '''
-cloudelementssdk: tests module.
+cloudelements: tests module.
 
 Meant for use with py.test.
 Organize tests into files, each named xxx_test.py

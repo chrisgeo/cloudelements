@@ -22,8 +22,8 @@ import os
 
 from requests.exceptions import *
 
-from cloudelementssdk.schemas.jsonschemas import *
-from cloudelementssdk.validation import validate_schema
+from cloudelements.schemas.jsonschemas import *
+from cloudelements.validation import validate_schema
 
 if os.getenv('DEBUG', False):
     from logging.config import dictConfig
