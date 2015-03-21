@@ -63,8 +63,7 @@ class TestCloudElements(unittest.TestCase):
         assert resp is not None
         assert type(resp.json()) == list
 
-    def test_create_crm_account(self):
-        return
+    def test_crm_account(self):
         #TODO SalesForce Instance needs storage
         resp = self.cloud_elements.get_instances()
         assert resp.status_code == 200
@@ -78,10 +77,29 @@ class TestCloudElements(unittest.TestCase):
         })
         assert resp.status_code == 200
         account = resp.json()
-        resp = self.cloud_elements.delete_crm_account_by_id(acct_id=account['id'])
+        acct_id = account['Id']
+        assert acct_id is not None
+        assert account['Name'] == 'Chris George'
+
+        resp = self.cloud_elements.update_crm_account_by_id(
+            acct_id=acct_id,
+            data={'Name': 'Test'}
+        )
+
+        assert resp is not None
+        assert resp.status_code == 200
+        assert resp.json()['Name'] == 'Test'
+
+        resp = self.cloud_elements. \
+            delete_crm_account_by_id(acct_id=account['Id'])
+
         assert resp.status_code == 200
 
-    def test_get_crm_contacts(self):
+        #fail getting it
+        resp = self.cloud_elements.get_crm_account_by_id(acct_id=acct_id)
+        assert resp.status_code == 404
+
+    def test_crm_contacts(self):
         resp = self.cloud_elements.get_instances()
         assert resp.status_code == 200
         instances = resp.json()
@@ -94,14 +112,14 @@ class TestCloudElements(unittest.TestCase):
         assert resp.json() is not None
         assert type(resp.json()) == list
 
-    def test_get_crm_leads(self):
+    def test_crm_leads(self):
         resp = self.cloud_elements.get_instances()
         assert resp.status_code == 200
         instances = resp.json()
         assert len(instances) > 0
         instance = instances[0]
         self.cloud_elements.element_token = instance['token']
-        resp = self.cloud_elements.get_crm_leads(query='name like "chris"')
+        resp = self.cloud_elements.get_crm_leads(query='firstName is not null')
         resp.status_code == 200
         assert resp.json() is not None
         assert type(resp.json()) == list
