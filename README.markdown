@@ -19,7 +19,7 @@ Current Version: 0.1
 ## SETUP
 Instead of having set variables in the file, the tests rely on environment variables for your instances.
 
-You can use a tool like [direnv]() or [autoenv]()
+You can use a tool like [direnv](https://github.com/zimbatm/direnv/) or [autoenv](https://github.com/kennethreitz/autoenv)
 
 Currently the tests use these:
 
