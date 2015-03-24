@@ -35,6 +35,7 @@ setup(name="cloudelements",
       zip_safe=False,
       tests_require=['pytest'],
       setup_requires=['setuptools_git'],
+      data_files=['dev_logging.conf'],
       install_requires=requires,
       entry_points={}
 )
