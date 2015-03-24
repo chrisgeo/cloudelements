@@ -1,19 +1,3 @@
-"""
-Response Messages
-HTTP Status Code    Reason  Response Model
-200 OK - Everything worked as expected
-400 Bad Request - Often due to a missing request parameter
-401 Unauthorized - An invalid element token, user secret and/or org secret provided
-403 Forbidden - Access to the resource by the provider is forbidden
-404 Not found - The requested resource is not found
-405 Method not allowed - Incorrect HTTP verb used, e.g., GET used when POST expected
-406 Not acceptable - The response content type does not match the "Accept" header value
-409 Conflict - If a resource being created already exists
-415 Unsupported media type - The server cannot handle the requested Content-Type
-500 Server error - Something went wrong on the Cloud Elements server
-502 Provider server error - Something went wrong on the Provider or Endpoint's server
-"""
-
 import logging
 import json
 import requests
@@ -25,7 +9,7 @@ from requests.exceptions import *
 from cloudelements.schemas.jsonschemas import *
 from cloudelements.validation import validate_schema
 
-if os.getenv('DEBUG', False):
+if os.getenv('DEBUG', False) and os.path.isfile('dev_logging.conf'):
     from logging.config import dictConfig
     dictConfig(
         json.loads(open('dev_logging.conf').read())
