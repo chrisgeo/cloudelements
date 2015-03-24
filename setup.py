@@ -16,7 +16,7 @@ README = open(os.path.join(here, 'README.markdown')).read()
 CHANGES = open(os.path.join(here, 'CHANGELOG.txt')).read()
 requires = open(os.path.join(here, 'requirements.txt')).read().splitlines()
 
-version = "0.1.1"
+version = "0.1.2"
 
 setup(name="cloudelements",
       version=version,
@@ -35,7 +35,6 @@ setup(name="cloudelements",
       zip_safe=False,
       tests_require=['pytest'],
       setup_requires=['setuptools_git'],
-      data_files=['dev_logging.conf'],
       install_requires=requires,
       entry_points={}
 )
