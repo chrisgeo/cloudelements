@@ -446,7 +446,7 @@ class CloudElements(BaseRequest):
                     "oauth.api.secret": secret
                 },
                 'name': name,
-                'provisionCode': {
+                'providerData': {
                     'code': code
                 }
             }
