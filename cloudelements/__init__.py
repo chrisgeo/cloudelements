@@ -464,12 +464,18 @@ class CloudElements(BaseRequest):
 
         def delete_instance(self, instance_id):
             """ /instances/{id} DELETE """
-            url = '/instances/%s' % id
-            return self._delete(url)
+            url = '%s/%s' % (self.paths['instances'], id)
+            return self._delete(self.paths['instances'])
 
         def get_instances(self):
             """ /instances GET """
 
             return self._get(self.paths['instances'])
+
+        def get_instance(self, instance_id):
+            """ /instances/{id} GET """
+
+            url = "%s/%s" % (self.paths['instances'], instance_id)
+            return self._get(url)
 
         #TODO opportunities, objects, users

@@ -248,3 +248,17 @@ class TestCloudElements(unittest.TestCase):
         resp = ce.get_instances()
         assert resp.status_code == 200
         assert resp.json() == dict(foo='bar')
+
+    @httpretty.activate
+    def test_get_instance(self):
+        import json
+        ce = self.cloud_elements
+        httpretty.register_uri(
+            httpretty.GET,
+            ce.base_url + ce.paths['instances'] + '/1',
+            body=json.dumps(dict(foo='bar'))
+        )
+
+        resp = ce.get_instance(1)
+        assert resp.status_code == 200
+        assert resp.json() == dict(foo='bar')

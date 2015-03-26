@@ -169,6 +169,17 @@ class TestCloudElements(unittest.TestCase):
 
         assert resp.status_code == 200
 
+    def test_crm_instances(self):
+        resp = self.cloud_elements.get_instances()
+        assert resp.status_code == 200
+        instances = resp.json()
+        assert len(instances) > 0
+        instance = instances[0]
+
+        instance_id  = instance['id']
+        resp = self.cloud_elements.get_instance(instance_id)
+        assert resp.status_code == 200
+        assert resp.json()['id'] == instance_id
 
     """ We're just going to revisit this later
     def test_provision_sales_force_instance(self):

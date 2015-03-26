@@ -16,7 +16,7 @@ README = open(os.path.join(here, 'README.markdown')).read()
 CHANGES = open(os.path.join(here, 'CHANGELOG.txt')).read()
 requires = open(os.path.join(here, 'requirements.txt')).read().splitlines()
 
-version = "0.1.3"
+version = "0.1.4"
 
 setup(name="cloudelements",
       version=version,
