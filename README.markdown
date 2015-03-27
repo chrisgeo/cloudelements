@@ -1,4 +1,4 @@
-CLOUD ELEMENTS PYTHON SDK
+CLOUD ELEMENTS PYTHON SDK [![Build Status](https://travis-ci.org/MobileWorks/cloudelements.svg)](https://travis-ci.org/MobileWorks/cloudelements)
 ==========================
 
 This SDK is a basic wrapper around the HTTP/S calls needed to use CloudElements
