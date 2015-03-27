@@ -236,8 +236,10 @@ class TestCRMHub(TestCloudElements):
         assert httpretty.last_request().method == httpretty.GET
 
     @httpretty.activate
-    def test_upload_bulk(self):
-        pass
+    def test_create_crm_bulk_objects(self):
+        assert (
+            self.cloud_elements.create_crm_bulk_objects('obj', 1, 12) is None
+        )
 
     @httpretty.activate
     def test_get_contacts(self):
@@ -268,6 +270,20 @@ class TestCRMHub(TestCloudElements):
         assert httpretty.last_request().method == httpretty.POST
 
     @httpretty.activate
+    def test_update_contact(self):
+        import json
+        ce = self.cloud_elements
+
+        httpretty.register_uri(
+            httpretty.PATCH,
+            ce.base_url + ce.paths['contacts_crm'] + '/1',
+            body=json.dumps({'foo': 1})
+        )
+        resp = self.cloud_elements.update_crm_contact(1, {'lastname': 'foo'})
+        assert resp.json() == {'foo': 1}
+        assert httpretty.last_request().method == httpretty.PATCH
+
+    @httpretty.activate
     def test_delete_contact(self):
         import json
         ce = self.cloud_elements
@@ -280,6 +296,20 @@ class TestCRMHub(TestCloudElements):
         resp = self.cloud_elements.delete_crm_contact(1)
         assert resp.json() == {'foo': 1}
         assert httpretty.last_request().method == httpretty.DELETE
+
+    @httpretty.activate
+    def test_get_contact(self):
+        import json
+        ce = self.cloud_elements
+
+        httpretty.register_uri(
+            httpretty.GET,
+            ce.base_url + '%s/%s' % (ce.paths['contacts_crm'], 1),
+            body=json.dumps({'foo': 1})
+        )
+        resp = self.cloud_elements.get_crm_contact(1)
+        assert resp.json() == {'foo': 1}
+        assert httpretty.last_request().method == httpretty.GET
 
     @httpretty.activate
     def test_get_leads(self):
@@ -447,7 +477,8 @@ class TestInstances(TestCloudElements):
             secret='bar',
             callback_url='http://test.com',
             name='test',
-            code='blahblah'
+            code='blahblah',
+            tags=['foo']
         )
         assert resp.status_code == 200
         assert resp.json() == dict(foo='bar')

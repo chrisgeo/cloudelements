@@ -229,7 +229,7 @@ instance_provision_schema = {
             },
             'required': False
         },
-        "tags": string_schema_allow_empty,
+        "tags": array_of_strings_schema,
         "name": string_schema,
         "valid": boolean_schema,
         "channelname": string_schema,
