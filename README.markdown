@@ -1,7 +1,7 @@
 CLOUD ELEMENTS PYTHON SDK 
 ==========================
 
-[![Build Status](https://travis-ci.org/MobileWorks/cloudelements.svg)](https://travis-ci.org/MobileWorks/cloudelements)
+[![Build Status](https://travis-ci.org/MobileWorks/cloudelements.svg)](https://travis-ci.org/MobileWorks/cloudelements) [![Coverage Status](https://coveralls.io/repos/MobileWorks/cloudelements/badge.svg)](https://coveralls.io/r/MobileWorks/cloudelements) [![Join the chat at https://gitter.im/MobileWorks/cloudelements](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/MobileWorks/cloudelements?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This SDK is a basic wrapper around the HTTP/S calls needed to use CloudElements
 
