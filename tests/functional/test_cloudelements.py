@@ -21,6 +21,59 @@ class TestCloudElements(unittest.TestCase):
             org_secret=self.org_secret
         )
 
+
+class TestHub(TestCloudElements):
+
+    def test_get_hubs(self):
+        resp = self.cloud_elements.get_hubs()
+        assert resp is not None
+        assert resp.status_code == 200
+        hubs = resp.json()
+        assert type(hubs) == list
+        crm = False
+        for hub in hubs:
+            if 'crm' == hub['key']:
+                crm = True
+                break
+        assert crm is True
+
+    def test_hubs_keys(self):
+        resp = self.cloud_elements.get_hubs_keys()
+        assert resp is not None
+        assert resp.status_code == 200
+        hubs = resp.json()
+        assert type(hubs) == list
+        assert 'crm' in hubs
+
+    def test_get_hub_key(self):
+        resp = self.cloud_elements.get_hub_key('crm')
+        assert resp is not None
+        assert resp.status_code == 200
+        assert resp.json() == \
+            {
+                "id": 11,
+                "name": "CRM",
+                "key": "crm",
+                "description": "CRM Element Hub",
+                "videoLink": "//player.vimeo.com/video/113632224?title=0&amp;byline=0&amp;portrait=0&amp;autoplay=1",
+                "active": True
+            }
+
+    def test_get_hub_key_for_elements(self):
+        resp = self.cloud_elements.get_hub_key_for_elements('crm')
+        assert resp is not None
+        assert resp.status_code == 200
+        assert type(resp.json()) == list
+        elements = resp.json()
+        sfdc = False
+        for element in elements:
+            if 'sfdc' == element['key']:
+                sfdc = True
+                break
+        assert sfdc is True
+
+
+class TestInstances(TestCloudElements):
     def test_get_sales_force_provision_url(self):
         resp = self.cloud_elements.get_sales_force_provision_url(
             key=self.sales_force_access_key,
@@ -53,6 +106,41 @@ class TestCloudElements(unittest.TestCase):
         assert resp.json() is not None
         assert type(resp.json()) == list
 
+    def test_get_instance(self):
+        # need to create an instance
+        resp = self.cloud_elements.get_instances()
+        assert resp is not None
+        instance = resp.json().pop()
+        resp = self.cloud_elements.get_instance(instance['id'])
+
+        assert resp is not None
+        assert resp.status_code == 200
+
+    """
+    def test_provision_sales_force_instance(self):
+        import random
+        name = 'test_instance_%s' % random.randint(0, 1000)
+        resp = self.cloud_elements.provision_sales_force_instance(
+            key=self.sales_force_access_key,
+            secret=self.sales_force_secret,
+            callback_url='http://localhost',
+            name=name,
+            code='adfasdfadfsdafsadfsadfsaf'
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert 'id' in data
+        assert data['name'] == name
+        assert data['id'] is not None
+
+        #delete instance
+        #resp = self.cloud_elements.delete_instance(instance_id=data['id'])
+        #assert resp.status_code == 200
+    """
+
+
+class TestCRMHub(TestCloudElements):
+
     def test_get_crm_accounts(self):
         resp = self.cloud_elements.get_instances()
         assert resp.status_code == 200
@@ -64,7 +152,6 @@ class TestCloudElements(unittest.TestCase):
         assert type(resp.json()) == list
 
     def test_crm_account(self):
-        #TODO SalesForce Instance needs storage
         resp = self.cloud_elements.get_instances()
         assert resp.status_code == 200
         instances = resp.json()
@@ -95,7 +182,7 @@ class TestCloudElements(unittest.TestCase):
 
         assert resp.status_code == 200
 
-        #fail getting it
+        # fail getting it
         resp = self.cloud_elements.get_crm_account_by_id(acct_id=acct_id)
         assert resp.status_code == 404
 
@@ -181,24 +268,41 @@ class TestCloudElements(unittest.TestCase):
         assert resp.status_code == 200
         assert resp.json()['id'] == instance_id
 
-    """ We're just going to revisit this later
-    def test_provision_sales_force_instance(self):
-        import random
-        name = 'test_instance_%s' % random.randint(0, 1000)
-        resp = self.cloud_elements.provision_sales_force_instance(
+
+class TestElements(TestCloudElements):
+    def test_get_all_elements(self):
+        resp = self.cloud_elements.get_all_elements()
+        assert resp is not None
+        assert resp.status_code == 200
+        assert type(resp.json()) == list
+
+    def test_get_all_element_keys(self):
+        resp = self.cloud_elements.get_all_element_keys()
+
+        assert resp is not None
+        assert resp.status_code == 200
+        keys = resp.json()
+        assert type(keys) == list
+        assert 'sfdc' in keys
+        assert 'sugar' in keys
+
+    def test_get_element_config_by_key(self):
+        resp = self.cloud_elements.get_element_config_by_key('sfdc')
+        assert resp is not None
+        assert resp.status_code == 200
+        keys = resp.json()
+        assert 'configuration' in keys
+        assert type(keys['configuration']) == list
+
+    def test_get_sales_force_provision_url(self):
+        resp = self.cloud_elements.get_sales_force_provision_url(
             key=self.sales_force_access_key,
             secret=self.sales_force_secret,
-            callback_url=self.sales_force_callback,
-            name=name,
-            code='adfasdfadfsdafsadfsadfsaf'
+            callback_url='http://localhost'
         )
+        assert resp is not None
         assert resp.status_code == 200
-        data = resp.json()
-        assert 'id' in data
-        assert data['name'] == name
-        assert data['id'] is not None
 
-        #delete instance
-        #resp = self.cloud_elements.delete_instance(instance_id=data['id'])
-        #assert resp.status_code == 200
-    """
+        assert resp.json()['element'] == 'sfdc'
+
+
