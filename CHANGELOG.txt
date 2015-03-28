@@ -1,4 +1,10 @@
-Version 0.1
------------
+v0.2
+----
+* More complete coverage for the CE API including CRM hubs, instances, elements, and providers
+* Updated test cover
+* More consistent naming conventions
+* Group tests via "type"
 
-    - Initial version.
+v0.1
+-----
+* Mostly SalesForce and CRM Hub integration

@@ -1,12 +1,22 @@
-CLOUD ELEMENTS PYTHON SDK 
+CLOUD ELEMENTS PYTHON SDK
 ==========================
 
 [![Build Status](https://travis-ci.org/MobileWorks/cloudelements.svg)](https://travis-ci.org/MobileWorks/cloudelements) [![Coverage Status](https://coveralls.io/repos/MobileWorks/cloudelements/badge.svg?branch=master)](https://coveralls.io/r/MobileWorks/cloudelements?branch=master) [![Join the chat at https://gitter.im/MobileWorks/cloudelements](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/MobileWorks/cloudelements?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This SDK is a basic wrapper around the HTTP/S calls needed to use CloudElements
 
-Current Version: 0.1
+Current Version: 0.2
 ------
+
+v0.2
+----
+* More complete coverage for the CE API including CRM hubs, instances, elements, and providers
+* Updated test cover
+* More consistent naming conventions
+* Group tests via "type"
+
+v0.1
+-----
 * Mostly SalesForce and CRM Hub integration
 
 
