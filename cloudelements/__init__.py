@@ -301,7 +301,8 @@ class CloudElements(BaseRequest):
         params = {
             'where': query,
             'page': page,
-            'pageSize': page_size
+            'pageSize': page_size,
+            'returnTotalCount': True # if we're paginating, always get the total.
         }
 
         return self._get(self.paths['accounts_crm'], params=params)
@@ -404,7 +405,8 @@ class CloudElements(BaseRequest):
         params = {
             'query': query,
             'page': DEFAULT_PAGE,
-            'pageSize': DEFAULT_PAGE_SIZE
+            'pageSize': DEFAULT_PAGE_SIZE,
+            'returnTotalCount': True # if we're paginating, always get the total.
         }
 
         return self._get(self.paths['contacts_crm'], params=params)
@@ -431,7 +433,8 @@ class CloudElements(BaseRequest):
         params = {
             'query': query,
             'page': page,
-            'pageSize': page_size
+            'pageSize': page_size,
+            'returnTotalCount': True # if we're paginating, always get the total.
         }
 
         return self._get(self.paths['leads_crm'], params=params)

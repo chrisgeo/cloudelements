@@ -239,8 +239,7 @@ class TestCRMHub(TestCloudElements):
             get_crm_leads(query='firstname is not null', page=0, page_size=5)
         assert resp.status_code == 200
         assert 'elements-returned-count' in resp.headers.keys()
-        # Bug filed against CloudElements #888
-        # assert 'elements-total-count' in resp.headers.keys()
+        assert 'elements-total-count' in resp.headers.keys()
         assert int(resp.headers.get('elements-returned-count')) == 5
         leads = resp.json()
         assert len(leads) == 5
