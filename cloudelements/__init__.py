@@ -415,10 +415,16 @@ class CloudElements(BaseRequest):
 
         return self._delete(url)
 
-    def get_crm_leads(self, query):
-        """ /hubs/crm/leads GET """
+    def get_crm_leads(self, query, page=0, page_size=1000):
+        """ /hubs/crm/leads GET
+            `Pagination`:
+                Elements-Returned-Count
+                Elements-Total-Count
+        """
         params = {
-            'query': query
+            'query': query,
+            'page': page,
+            'pageSize': page_size
         }
 
         return self._get(self.paths['leads_crm'], params=params)

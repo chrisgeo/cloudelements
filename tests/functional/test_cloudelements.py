@@ -234,6 +234,17 @@ class TestCRMHub(TestCloudElements):
         assert resp.json() is not None
         assert type(resp.json()) == list
 
+        # test with pagination
+        resp = self.cloud_elements.\
+            get_crm_leads(query='firstname is not null', page=0, page_size=5)
+        assert resp.status_code == 200
+        assert 'elements-returned-count' in resp.headers.keys()
+        # Bug filed against CloudElements #888
+        # assert 'elements-total-count' in resp.headers.keys()
+        assert int(resp.headers.get('elements-returned-count')) == 5
+        leads = resp.json()
+        assert len(leads) == 5
+
         resp = self.cloud_elements.\
             create_crm_lead(data={
                 'lastname': 'foo',
