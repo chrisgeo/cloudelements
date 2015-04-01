@@ -8,6 +8,10 @@ This SDK is a basic wrapper around the HTTP/S calls needed to use CloudElements
 Current Version: 0.2
 ------
 
+v0.2.1
+----
+* Add pagination for CRM Hubs
+
 v0.2
 ----
 * More complete coverage for the CE API including CRM hubs, instances, elements, and providers
