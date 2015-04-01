@@ -17,6 +17,8 @@ if os.getenv('DEBUG', False) and os.path.isfile('dev_logging.conf'):
 
 log = logging.getLogger(__name__)
 
+DEFAULT_PAGE = 0
+DEFAULT_PAGE_SIZE = 200
 
 def _log_info(path, status, data, request_type, headers, chrono,  exception=None):
     if exception:
@@ -294,11 +296,14 @@ class CloudElements(BaseRequest):
     ##################
     # CRM HUB Methods
     ##################
-    def get_crm_accounts(self,  query):
+    def get_crm_accounts(self,  query, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE):
         """ /hubs/crm/accounts GET """
         params = {
-            'where': query
+            'where': query,
+            'page': page,
+            'pageSize': page_size
         }
+
         return self._get(self.paths['accounts_crm'], params=params)
 
     @validate_schema(schema=account_schema)
@@ -394,10 +399,12 @@ class CloudElements(BaseRequest):
         url = '%s/%s' % (self.paths['contacts_crm'], contact_id)
         return self._get(url)
 
-    def get_crm_contacts(self, query):
+    def get_crm_contacts(self, query, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE):
         """ /hubs/crm/contacts GET """
         params = {
-            'query': query
+            'query': query,
+            'page': DEFAULT_PAGE,
+            'pageSize': DEFAULT_PAGE_SIZE
         }
 
         return self._get(self.paths['contacts_crm'], params=params)
@@ -415,7 +422,7 @@ class CloudElements(BaseRequest):
 
         return self._delete(url)
 
-    def get_crm_leads(self, query, page=0, page_size=1000):
+    def get_crm_leads(self, query, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE):
         """ /hubs/crm/leads GET
             `Pagination`:
                 Elements-Returned-Count
